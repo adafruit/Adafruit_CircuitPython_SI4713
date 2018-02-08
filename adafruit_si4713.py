@@ -261,7 +261,7 @@ class SI4713:
         self._BUFFER[1] = 0x01
         self._write_from(self._BUFFER, count=2)
         # Now read 5 bytes of response data.
-        self._read_into(self._BUFFER, count=8)
+        self._read_into(self._BUFFER, count=5)
 
     @property
     def tx_frequency_khz(self):
@@ -379,7 +379,7 @@ class SI4713:
         """
         # Perform ASQ request, then parse out 8 bit _signed_ input level value.
         self._asq_status()
-        return ustruct.unpack('bbbb', self._BUFFER)[3]
+        return ustruct.unpack('bbbbb', self._BUFFER)[4]
 
     @property
     def audio_signal_status(self):
@@ -391,7 +391,7 @@ class SI4713:
         """
         # Perform ASQ request, the parse out the status byte.
         self._asq_status()
-        return self._BUFFER[0]
+        return self._BUFFER[1]
 
     def gpio_control(self, gpio1=False, gpio2=False, gpio3=False):
         """Control the GPIO outputs of the chip.  Each gpio1, gpio2, gpio3
