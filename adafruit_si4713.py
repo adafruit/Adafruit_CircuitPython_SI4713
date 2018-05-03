@@ -32,7 +32,10 @@ at: https://github.com/adafruit/Adafruit-Si4713-Library/
 import time
 
 from micropython import const
-import ustruct
+try:
+    import struct
+except ImportError:
+    import ustruct as struct
 
 import adafruit_bus_device.i2c_device as i2c_device
 
@@ -379,7 +382,7 @@ class SI4713:
         """
         # Perform ASQ request, then parse out 8 bit _signed_ input level value.
         self._asq_status()
-        return ustruct.unpack('bbbbb', self._BUFFER)[4]
+        return struct.unpack('bbbbb', self._BUFFER)[4]
 
     @property
     def audio_signal_status(self):
