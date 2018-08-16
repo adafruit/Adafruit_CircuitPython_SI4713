@@ -127,7 +127,7 @@ class SI4713:
         if self._reset is not None:
             self._reset.switch_to_output(value=True)
 
-            # Toggle reset line low to reset the chip and then wait a bit for 
+            # Toggle reset line low to reset the chip and then wait a bit for
             # startup - this is necessary before initializing as an i2c device
             # on at least the Raspberry Pi, and potentially elsewhere:
             self._reset.value = True
