@@ -4,6 +4,7 @@ import time
 
 import board
 import busio
+import digitalio
 
 import adafruit_si4713
 
@@ -24,7 +25,6 @@ i2c = busio.I2C(board.SCL, board.SDA)
 # If you hooked up the reset line you should specify that too.  Make sure
 # to pass in a DigitalInOut instance.  You will need the reset pin with the
 # Raspberry Pi, and probably other devices:
-import digitalio
 reset = digitalio.DigitalInOut(board.D5)
 
 print('initializing si4713 instance')
