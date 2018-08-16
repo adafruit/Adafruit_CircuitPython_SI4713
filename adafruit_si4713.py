@@ -120,11 +120,24 @@ class SI4713:
 
     def __init__(self, i2c, *, address=_SI4710_ADDR1, reset=None, timeout_s=0.1):
         self._timeout_s = timeout_s
-        self._device = i2c_device.I2CDevice(i2c, address)
+
         # Configure reset line if it was provided.
         self._reset = reset
+
         if self._reset is not None:
             self._reset.switch_to_output(value=True)
+
+            # Toggle reset line low to reset the chip and then wait a bit for 
+            # startup - this is necessary before initializing as an i2c device
+            # on at least the Raspberry Pi, and potentially elsewhere:
+            self._reset.value = True
+            time.sleep(0.01)
+            self._reset.value = False
+            time.sleep(0.01)
+            self._reset.value = True
+            time.sleep(0.25)
+
+        self._device = i2c_device.I2CDevice(i2c, address)
         self.reset()
         # Check product ID.
         if self._get_product_number() != 13:
@@ -382,8 +395,7 @@ class SI4713:
         """
         # Perform ASQ request, then parse out 8 bit _signed_ input level value.
         self._asq_status()
-        return struct.unpack('bbbbb', self._BUFFER)[4]
-
+        return struct.unpack('bbbbb', self._BUFFER[0:5])[4]
     @property
     def audio_signal_status(self):
         """Retrieve the ASQ or audio signal quality status value from the chip.
