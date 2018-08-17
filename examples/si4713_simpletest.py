@@ -4,27 +4,31 @@ import time
 
 import board
 import busio
+import digitalio
 
 import adafruit_si4713
-
 
 # Specify the FM frequency to transmit on in kilohertz.  As the datasheet
 # mentions you can only specify 50khz steps!
 FREQUENCY_KHZ = 102300  # 102.300mhz
 
-
 # Initialize I2C bus.
 i2c = busio.I2C(board.SCL, board.SDA)
 
 # Initialize SI4713.
-si4713 = adafruit_si4713.SI4713(i2c)
+# si4713 = adafruit_si4713.SI4713(i2c)
+
 # Alternatively you can specify the I2C address of the device if it changed:
-#si4713 = adafruit_si4713.SI4713(i2c, address=0x11)
-# Also if you hooked up the reset line you can specify that too.  Make sure
-# to pass in a DigitalInOut instance:
-#import digitalio
-#reset = digitalio.DigitalInOut(board.D5)
-#si4713 = adafruit_si4713.SI4713(i2c, reset=reset)
+# si4713 = adafruit_si4713.SI4713(i2c, address=0x11)
+
+# If you hooked up the reset line you should specify that too.  Make sure
+# to pass in a DigitalInOut instance.  You will need the reset pin with the
+# Raspberry Pi, and probably other devices:
+si_reset = digitalio.DigitalInOut(board.D5)
+
+print('initializing si4713 instance')
+si4713 = adafruit_si4713.SI4713(i2c, reset=si_reset, timeout_s=0.5)
+print('done')
 
 # Measure the noise level for the transmit frequency (this assumes automatic
 # antenna capacitance setting, but see below to adjust to a specific value).
