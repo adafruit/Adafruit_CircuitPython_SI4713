@@ -24,10 +24,10 @@ i2c = busio.I2C(board.SCL, board.SDA)
 # If you hooked up the reset line you should specify that too.  Make sure
 # to pass in a DigitalInOut instance.  You will need the reset pin with the
 # Raspberry Pi, and probably other devices:
-reset = digitalio.DigitalInOut(board.D5)
+si_reset = digitalio.DigitalInOut(board.D5)
 
 print('initializing si4713 instance')
-si4713 = adafruit_si4713.SI4713(i2c, reset=reset, timeout_s=0.5)
+si4713 = adafruit_si4713.SI4713(i2c, reset=si_reset, timeout_s=0.5)
 print('done')
 
 # Measure the noise level for the transmit frequency (this assumes automatic
