@@ -453,14 +453,14 @@ class SI4713:
         # Set the RDS station broadcast value.
         station_length = len(station)
         assert 0 <= station_length <= 96
-        self._BUFFER[0] = _SI4710_CMD_TX_RDS_PS
         # Fire off each 4 byte update of the station value.
         for i in range(0, station_length, 4):
+            self._BUFFER[0] = _SI4710_CMD_TX_RDS_PS
             self._BUFFER[1] = i // 4
-            self._BUFFER[2] = station[i] if i < station_length else ' '
-            self._BUFFER[3] = station[i+1] if i+1 < station_length else ' '
-            self._BUFFER[4] = station[i+2] if i+2 < station_length else ' '
-            self._BUFFER[5] = station[i+3] if i+3 < station_length else ' '
+            self._BUFFER[2] = station[i] if i < station_length else 0x00
+            self._BUFFER[3] = station[i+1] if i+1 < station_length else 0x00
+            self._BUFFER[4] = station[i+2] if i+2 < station_length else 0x00
+            self._BUFFER[5] = station[i+3] if i+3 < station_length else 0x00
             self._write_from(self._BUFFER, count=6)
 
     def _set_rds_buffer(self, rds_buffer):
@@ -468,21 +468,17 @@ class SI4713:
         buf_length = len(rds_buffer)
         # 53 blocks in the circular buffer, each 2 bytes long.
         assert 0 <= buf_length <= 106
-        self._BUFFER[0] = _SI4710_CMD_TX_RDS_BUFF
-        self._BUFFER[1] = 0x06  # Clear the buffer and start update with first
-                                # request, then future requests will turn off
-                                # the empty bit to continue setting data.
-        self._BUFFER[2] = 0x20
         # Fire off each 4 byte update of the station value.
         for i in range(0, buf_length, 4):
+            self._BUFFER[0] = _SI4710_CMD_TX_RDS_BUFF
+            self._BUFFER[1] = 0x06 if i==0 else 0x04
+            self._BUFFER[2] = 0x20
             self._BUFFER[3] = i // 4
-            self._BUFFER[4] = rds_buffer[i] if i < buf_length else ' '
-            self._BUFFER[5] = rds_buffer[i+1] if i+1 < buf_length else ' '
-            self._BUFFER[6] = rds_buffer[i+2] if i+2 < buf_length else ' '
-            self._BUFFER[7] = rds_buffer[i+3] if i+3 < buf_length else ' '
+            self._BUFFER[4] = rds_buffer[i] if i < buf_length else 0x00
+            self._BUFFER[5] = rds_buffer[i+1] if i+1 < buf_length else 0x00
+            self._BUFFER[6] = rds_buffer[i+2] if i+2 < buf_length else 0x00
+            self._BUFFER[7] = rds_buffer[i+3] if i+3 < buf_length else 0x00
             self._write_from(self._BUFFER, count=8)
-            # Make sure to turn off empty bit for next requests.
-            self._BUFFER[1] = 0x04
 
     rds_station = property(None, _set_rds_station, None,
                            """Set the RDS broadcast station to the specified
