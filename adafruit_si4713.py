@@ -471,7 +471,7 @@ class SI4713:
         # Fire off each 4 byte update of the station value.
         for i in range(0, buf_length, 4):
             self._BUFFER[0] = _SI4710_CMD_TX_RDS_BUFF
-            self._BUFFER[1] = 0x06 if i==0 else 0x04
+            self._BUFFER[1] = 0x06 if i == 0 else 0x04
             self._BUFFER[2] = 0x20
             self._BUFFER[3] = i // 4
             self._BUFFER[4] = rds_buffer[i] if i < buf_length else 0x00
