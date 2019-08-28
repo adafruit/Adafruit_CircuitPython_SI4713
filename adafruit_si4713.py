@@ -147,7 +147,9 @@ class SI4713:
         # Read an 8-bit unsigned value from the specified 8-bit address.
         with self._device as i2c:
             self._BUFFER[0] = address & 0xFF
-            i2c.write(self._BUFFER, end=1, stop=True)
+            # TODO: This is probably wrong and should be write_then_readinto to avoid a stop before
+            # repeated start.
+            i2c.write(self._BUFFER, end=1)
             i2c.readinto(self._BUFFER, end=1)
         return self._BUFFER[0]
 
@@ -169,8 +171,9 @@ class SI4713:
         if count is None:
             count = len(buf)
         # Send command.
+        # TODO: This probably needs to be one write_then_readinto.
         with self._device as i2c:
-            i2c.write(buf, end=count, stop=True)
+            i2c.write(buf, end=count)
         # Poll the status bit waiting for success or throwing a timeout error.
         start = time.monotonic()
         while True:
