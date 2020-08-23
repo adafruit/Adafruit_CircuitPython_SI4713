@@ -45,7 +45,6 @@ __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_SI4713.git"
 
 
-# pylint: disable=bad-whitespace
 # Internal constants:
 _SI4710_ADDR0 = const(0x11)  # if SEN is = const(low)
 _SI4710_ADDR1 = const(0x63)  # if SEN is high, default
@@ -100,7 +99,6 @@ _SI4713_PROP_TX_RDS_PS_REPEAT_COUNT = const(0x2C04)
 _SI4713_PROP_TX_RDS_MESSAGE_COUNT = const(0x2C05)
 _SI4713_PROP_TX_RDS_PS_AF = const(0x2C06)
 _SI4713_PROP_TX_RDS_FIFO_SIZE = const(0x2C07)
-# pylint: enable=bad-whitespace
 
 
 class SI4713:
