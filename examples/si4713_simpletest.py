@@ -1,5 +1,8 @@
+# SPDX-FileCopyrightText: 2018 Tony DiCola for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 # Simple demo of using the SI4743 RDS FM transmitter.
-# Author: Tony DiCola
+
 import time
 
 import board
