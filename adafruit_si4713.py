@@ -122,8 +122,8 @@ class SI4713:
         self._device = i2c_device.I2CDevice(i2c, address)
         self.reset()
         # Check product ID.
-        if self._get_product_number() != 13:
-            raise RuntimeError("Failed to find SI4713, check wiring!")
+        if self._get_product_number() != 13 and self._get_product_number() != 21:
+            raise RuntimeError("Failed to find SI4713 or SI4721, check wiring!")
 
     def _read_u8(self, address):
         # Read an 8-bit unsigned value from the specified 8-bit address.
