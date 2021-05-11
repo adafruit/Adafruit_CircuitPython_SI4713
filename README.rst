@@ -13,7 +13,7 @@ Introduction
     :target: https://github.com/adafruit/Adafruit_CircuitPython_SI4713/actions/
     :alt: Build Status
 
-CircuitPython module for SI4713 FM RDS transmitter.
+CircuitPython module for SI4713 and SI4721 FM RDS transmitter.
 
 Dependencies
 =============
