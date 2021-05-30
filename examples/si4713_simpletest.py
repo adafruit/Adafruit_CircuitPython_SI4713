@@ -4,11 +4,8 @@
 # Simple demo of using the SI4743 RDS FM transmitter.
 
 import time
-
 import board
-import busio
 import digitalio
-
 import adafruit_si4713
 
 # Specify the FM frequency to transmit on in kilohertz.  As the datasheet
@@ -16,7 +13,7 @@ import adafruit_si4713
 FREQUENCY_KHZ = 102300  # 102.300mhz
 
 # Initialize I2C bus.
-i2c = busio.I2C(board.SCL, board.SDA)
+i2c = board.I2C()  # uses board.SCL and board.SDA
 
 # Initialize SI4713.
 # si4713 = adafruit_si4713.SI4713(i2c)

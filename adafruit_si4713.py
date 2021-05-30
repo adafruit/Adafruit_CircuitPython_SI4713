@@ -11,6 +11,21 @@ examples/simpletest.py for a demo of the usage.  Based on the Arduino library
 at: https://github.com/adafruit/Adafruit-Si4713-Library/
 
 * Author(s): Tony DiCola
+
+**Hardware:**
+
+* `Adafruit Stereo FM Transmitter with RDS/RBDS Breakout - Si4713
+  <https://www.adafruit.com/product/1958>`_ (Product ID: 1958)
+
+
+**Software and Dependencies:**
+
+* Adafruit CircuitPython firmware for the supported boards:
+  https://circuitpython.org/downloads
+
+* Adafruit's Bus Device library:
+  https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
+
 """
 import time
 
@@ -86,14 +101,14 @@ _SI4713_PROP_TX_RDS_FIFO_SIZE = const(0x2C07)
 
 class SI4713:
     """SI4713 RDS FM transmitter.  Initialize by specifying:
-     - i2c: The I2C bus connected to the board.
 
-    Optionally specify:
-     - address: The I2C address if it has been changed.
-     - reset: A DigitalInOut instance connected to the board's reset line,
-              this will be used to perform a soft reset when necessary.
-     - timeout_s: The amount of time (in seconds) to wait for a command to
-                  succeed.  If this timeout is exceed a runtime error is thrown.
+    :param ~busio.I2C i2c: The I2C bus connected to the board.
+    :param int address: The I2C address if it has been changed. Defaults to :const:`0x63`
+    :param ~digitalio.DigitalInOut reset: A DigitalInOut instance connected to
+     the board's reset line, this will be used to perform a soft reset when necessary.
+    :param float timeout_s: The amount of time (in seconds) to wait for a command to
+     succeed. If this timeout is exceed a runtime error is thrown. Defaults to :const:`0.1`
+
     """
 
     # Class-level buffer to reduce allocations and heap fragmentation.
