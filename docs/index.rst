@@ -23,8 +23,12 @@ Table of Contents
 .. toctree::
     :caption: Tutorials
 
+    Adafruit Stereo FM Transmitter with RDS/RBDS Breakout - Si4713 Learning Guide <https://learn.adafruit.com/adafruit-si4713-fm-radio-transmitter-with-rds-rdbs-support>
+
 .. toctree::
     :caption: Related Products
+
+    Adafruit Stereo FM Transmitter with RDS/RBDS Breakout - Si4713 <https://www.adafruit.com/product/1958>
 
 .. toctree::
     :caption: Other Links
