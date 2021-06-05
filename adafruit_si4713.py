@@ -454,7 +454,7 @@ class SI4713:
         station_length = len(station)
         assert 0 <= station_length <= 96
         # Fire off each 4 byte update of the station value.
-        for i in range(0, station_length, 4):
+        for i in range(0, 8, 4):
             self._BUFFER[0] = _SI4710_CMD_TX_RDS_PS
             self._BUFFER[1] = i // 4
             self._BUFFER[2] = station[i] if i < station_length else 0x00
