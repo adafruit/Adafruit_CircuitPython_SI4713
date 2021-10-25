@@ -60,6 +60,11 @@ Usage Example
 
 See examples/simpletest.py for a demo of the usage.
 
+Documentation
+=============
+
+API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/si4713/en/latest/>`_.
+
 Contributing
 ============
 
