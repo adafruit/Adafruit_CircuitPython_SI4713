@@ -13,6 +13,9 @@
 # dtoverlay=hifiberry-dac
 # dtoverlay=i2s-mmap
 
+# The internal quartz oscillator can't be used in digital input mode,
+# you have to remove the crystal, connect Dclk to the PCM clock insted,
+# and feed the reference clock at Pin 9 from an external 32768 Hz oscillator
 
 # Raspi             Adafruit Si4713
 #
