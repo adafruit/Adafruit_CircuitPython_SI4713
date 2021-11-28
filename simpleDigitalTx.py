@@ -45,7 +45,7 @@ si_address = 0x11 # I2C Adressen: 0x63 für CS=hi am Si4713/Si4721, 0x11 für CS
 si_reset = digitalio.DigitalInOut(board.D5) # GPIO5, = pin 29 am Raspi, nicht nötig bei Kondensatorreset (Qwiic board)
 #si_reset=None
 
-tx = adafruit_si4713.SI4713(i2c, address=si_address, reset=si_reset, timeout_s=0.5)
+tx = adafruit_si4713.SI4713(i2c, address=si_address, reset=si_reset, timeout_s=0.5, audio='digital')
 if not tx:
     print ("error! couldn't start SI4713 or 21 transmitter!")
 

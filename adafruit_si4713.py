@@ -99,12 +99,16 @@ class SI4713:
     # Class-level buffer to reduce allocations and heap fragmentation.
     # This is not thread-safe or re-entrant by design!
     _BUFFER = bytearray(10)
+    _audio  = 'analog' # analog or digital audio input
 
-    def __init__(self, i2c, *, address=_SI4710_ADDR1, reset=None, timeout_s=0.1):
+    def __init__(self, i2c, *, address=_SI4710_ADDR1, reset=None, timeout_s=0.1, audio='analog'):
         self._timeout_s = timeout_s
 
         # Configure reset line if it was provided.
         self._reset = reset
+
+        # Digital or analog audio input?
+        self._audio = audio
 
         if self._reset is not None:
             self._reset.switch_to_output(value=True)
@@ -204,32 +208,38 @@ class SI4713:
             time.sleep(0.01)
             self._reset.value = True
         # Next perform all the chip power up procedures.
-        self._BUFFER[0] = _SI4710_CMD_POWER_UP
-        #self._BUFFER[1] = 0x12 # original code
-        self._BUFFER[1] = 0xC2 # AN332, page 261 
-        # CTS interrupt disabled
-        # GPO2 output disabled
-        # Boot normally
-        # xtal oscillator ENabled
-        # FM transmit
-        # 0x0F digital (AN332, page 261), 0x50 analog input mode 
-        self._BUFFER[2] = 0x0F  # analog input mode
-        self._write_from(self._BUFFER, count=3)
+        if (self._audio == 'digital'):
+            print("will power up in digital input mode")
+            self._BUFFER[0] = _SI4710_CMD_POWER_UP
+            self._BUFFER[1] = 0xC2 # AN332, page 261 
+            # CTS interrupt ???
+            # GPO2 output ???
+            # Boot normally
+            # xtal oscillator disabled
+            # FM transmit
+            self._BUFFER[2] = 0x0F  # digital input mode (AN332, page 261)
+            self._write_from(self._BUFFER, count=3)
+        else:
+            print("will power up in analog input mode")
+            self._BUFFER[0] = _SI4710_CMD_POWER_UP
+            self._BUFFER[1] = 0x12
+            # CTS interrupt disabled
+            # GPO2 output disabled
+            # Boot normally
+            # xtal oscillator ENabled
+            # FM transmit
+            # 0x0F digital (AN332, page 261), 0x50 analog input mode 
+            self._BUFFER[2] = 0x50  # analog input mode
+            self._write_from(self._BUFFER, count=3)            
         # configuration! see datasheet page 254
         # crystal is 32.768
-        if self._set_property(_SI4713_PROP_REFCLK_FREQ, 32768):
-            print ("have set refClkFreq, return true")
-        else:
-            print("have set refClkFreq, return false")
+        self._set_property(_SI4713_PROP_REFCLK_FREQ, 32768)
         # 74uS pre-emph (USA std)
         self._set_property(_SI4713_PROP_TX_PREEMPHASIS, 0)
         # max gain?
         self._set_property(_SI4713_PROP_TX_ACOMP_GAIN, 10)
         # turn on limiter and AGC
         self._set_property(_SI4713_PROP_TX_ACOMP_ENABLE, 0x0)
-        # set default digital input parameters (16 bit, 48kHz)
-        #self._set_property(_SI4713_PROP_DIGITAL_INPUT_SAMPLE_RATE, 0xBB80)
-        #self._set_property(_SI4713_PROP_DIGITAL_INPUT_FORMAT, 0b0000000000001000)
 
     @property
     def interrupt_status(self):
