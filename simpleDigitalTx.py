@@ -2,7 +2,18 @@
 #
 #  simpleDigitalTx.py 2021 by Stefan Heimers
 
-# Verdrahtung:
+
+# If using a Raspberry Pi, set I2S to hifiberry-dac
+# mode, play a 48k stereo file with vlc and select
+# the correct audio device from the menu
+#
+# Put the following two lines (without the #) in
+# /boot/config.txt and reboot the Raspi
+#
+# dtoverlay=hifiberry-dac
+# dtoverlay=i2s-mmap
+
+
 # Raspi             Adafruit Si4713
 #
 # Pin 9 (Ground)    GND
