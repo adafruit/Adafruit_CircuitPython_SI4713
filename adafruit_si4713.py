@@ -27,15 +27,10 @@ at: https://github.com/adafruit/Adafruit-Si4713-Library/
   https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 
 """
+import struct
 import time
 
 from micropython import const
-
-try:
-    import struct
-except ImportError:
-    import ustruct as struct
-
 from adafruit_bus_device import i2c_device
 
 
