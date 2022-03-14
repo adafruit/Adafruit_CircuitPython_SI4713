@@ -99,9 +99,11 @@ class SI4713:
     # Class-level buffer to reduce allocations and heap fragmentation.
     # This is not thread-safe or re-entrant by design!
     _BUFFER = bytearray(10)
-    _audio  = 'analog' # analog or digital audio input
+    _audio = "analog"  # analog or digital audio input
 
-    def __init__(self, i2c, *, address=_SI4710_ADDR1, reset=None, timeout_s=0.1, audio='analog'):
+    def __init__(
+        self, i2c, *, address=_SI4710_ADDR1, reset=None, timeout_s=0.1, audio="analog"
+    ):
         self._timeout_s = timeout_s
 
         # Configure reset line if it was provided.
@@ -208,10 +210,10 @@ class SI4713:
             time.sleep(0.01)
             self._reset.value = True
         # Next perform all the chip power up procedures.
-        if (self._audio == 'digital'):
+        if self._audio == "digital":
             print("will power up in digital input mode")
             self._BUFFER[0] = _SI4710_CMD_POWER_UP
-            self._BUFFER[1] = 0xC2 # AN332, page 261 
+            self._BUFFER[1] = 0xC2  # AN332, page 261
             # CTS interrupt ???
             # GPO2 output ???
             # Boot normally
@@ -228,9 +230,9 @@ class SI4713:
             # Boot normally
             # xtal oscillator ENabled
             # FM transmit
-            # 0x0F digital (AN332, page 261), 0x50 analog input mode 
+            # 0x0F digital (AN332, page 261), 0x50 analog input mode
             self._BUFFER[2] = 0x50  # analog input mode
-            self._write_from(self._BUFFER, count=3)            
+            self._write_from(self._BUFFER, count=3)
         # configuration! see datasheet page 254
         # crystal is 32.768
         self._set_property(_SI4713_PROP_REFCLK_FREQ, 32768)
@@ -363,45 +365,44 @@ class SI4713:
 
     @property
     def digital_input_sample_rate(self):
-        print("test DISR, no value, not yet implemented")
         """Read the digital input sample rate. This property may
         only be set or read when in powerup mode. TX_TUNE_FREQ
         command must be sent after the POWER_UP command to start
         the internal clocking before setting this property.
         """
-        pass # TODO
-    
+        print("test DISR, no value, not yet implemented")
+        # TODO
+
     @digital_input_sample_rate.setter
-    def digital_input_sample_rate(self,val):
+    def digital_input_sample_rate(self, val):
         print("test DISR, with value")
         assert (val == 0) or (32000 <= val <= 48000)
-        print ("will set",val)
+        print("will set", val)
         if self._set_property(_SI4713_PROP_DIGITAL_INPUT_SAMPLE_RATE, val):
-            print ("have set, return true")
+            print("have set, return true")
         else:
-            print ("have set, return false")
+            print("have set, return false")
 
     @property
     def digital_input_format(self):
-        print("test DISR, no value")
         """Read the digital input sample rate. This property may
         only be set or read when in powerup mode. TX_TUNE_FREQ
         command must be sent after the POWER_UP command to start
         the internal clocking before setting this property.
         """
-        pass # TODO
-    
-    @digital_input_format.setter
-    def digital_input_format(self,val):
-        print("test digital input format, with value")
-        #assert (val == 0) or (32000 <= val <= 48000)
-        print ("will set",val)
-        if self._set_property(_SI4713_PROP_DIGITAL_INPUT_FORMAT, val):
-            print ("have set, return true")
-        else:
-            print ("have set, return false")
+        print("test DISR, no value")
+        # TODO
 
-            
+    @digital_input_format.setter
+    def digital_input_format(self, val):
+        print("test digital input format, with value")
+        # assert (val == 0) or (32000 <= val <= 48000)
+        print("will set", val)
+        if self._set_property(_SI4713_PROP_DIGITAL_INPUT_FORMAT, val):
+            print("have set, return true")
+        else:
+            print("have set, return false")
+
     def received_noise_level(self, frequency_khz, antenna_capacitance=0):
         """Measure the received noise level for the specified frequency (in
         kilohertz, 76mhz - 108mhz and must be a multiple of 50) and return its
