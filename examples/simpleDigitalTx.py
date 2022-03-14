@@ -70,14 +70,8 @@ if not tx:
 print("turn on audio now")
 sleep(10)
 
-try:
-    tx.digital_input_sample_rate = 0xBB80
-except:
-    print("Can't set 'digital input sample rate'")
-try:
-    tx.digital_input_format = hifiBerry
-except:
-    print("Can't set 'digital input format'")
+tx.digital_input_sample_rate = 0xBB80
+tx.digital_input_format = hifiBerry
 
 tx.tx_power = txPower
 tx.tx_frequency_khz = int(1000 * txFrequency)
