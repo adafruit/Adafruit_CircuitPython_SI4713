@@ -469,7 +469,7 @@ class SI4713:
         self._BUFFER[1] = set_command
         self._write_from(self._BUFFER, count=2)
 
-    def _set_rds_station(self, station: Optional[ReadableBuffer]) -> None:
+    def _set_rds_station(self, station: ReadableBuffer) -> None:
         # Set the RDS station broadcast value.
         station_length = len(station)
         assert 0 <= station_length <= 96
@@ -483,7 +483,7 @@ class SI4713:
             self._BUFFER[5] = station[i + 3] if i + 3 < station_length else 0x00
             self._write_from(self._BUFFER, count=6)
 
-    def _set_rds_buffer(self, rds_buffer: Optional[ReadableBuffer]) -> None:
+    def _set_rds_buffer(self, rds_buffer: ReadableBuffer) -> None:
         # Set the RDS buffer broadcast value.
         buf_length = len(rds_buffer)
         # 53 blocks in the circular buffer, each 2 bytes long.
