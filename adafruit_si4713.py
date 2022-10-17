@@ -38,6 +38,13 @@ except ImportError:
 
 from adafruit_bus_device import i2c_device
 
+try:
+    from typing import Optional
+    from circuitpython_typing import WriteableBuffer, ReadableBuffer
+    from digitalio import DigitalInOut
+    from busio import I2C
+except ImportError:
+    pass
 
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_SI4713.git"
@@ -115,7 +122,14 @@ class SI4713:
     # This is not thread-safe or re-entrant by design!
     _BUFFER = bytearray(10)
 
-    def __init__(self, i2c, *, address=_SI4710_ADDR1, reset=None, timeout_s=0.1):
+    def __init__(
+        self,
+        i2c: I2C,
+        *,
+        address: int = _SI4710_ADDR1,
+        reset: Optional[DigitalInOut] = None,
+        timeout_s: float = 0.1
+    ) -> None:
         self._timeout_s = timeout_s
 
         # Configure reset line if it was provided.
@@ -140,7 +154,7 @@ class SI4713:
         if self._get_product_number() != 13 and self._get_product_number() != 21:
             raise RuntimeError("Failed to find SI4713 or SI4721, check wiring!")
 
-    def _read_u8(self, address):
+    def _read_u8(self, address: int) -> int:
         # Read an 8-bit unsigned value from the specified 8-bit address.
         with self._device as i2c:
             self._BUFFER[0] = address & 0xFF
@@ -150,7 +164,7 @@ class SI4713:
             i2c.readinto(self._BUFFER, end=1)
         return self._BUFFER[0]
 
-    def _read_into(self, buf, count=None):
+    def _read_into(self, buf: WriteableBuffer, count: Optional[int] = None) -> None:
         # Read data directly from the I2C bus into the specified buffer.  If
         # count is not provided the buffer will be filled, otherwise count bytes
         # will be written to the buffer.
@@ -159,7 +173,7 @@ class SI4713:
         with self._device as i2c:
             i2c.readinto(buf, end=count)
 
-    def _write_from(self, buf, count=None):
+    def _write_from(self, buf: ReadableBuffer, count: Optional[int] = None) -> None:
         # Write a buffer of byte data to the chip.  If count is not specified
         # then the entire buffer is written, otherwise count bytes are written.
         # This function will wait to verify the command was successfully
@@ -181,7 +195,7 @@ class SI4713:
             if time.monotonic() - start > self._timeout_s:
                 raise RuntimeError("Timeout waiting for SI4723 response, check wiring!")
 
-    def _set_property(self, prop, val):
+    def _set_property(self, prop: int, val: int) -> None:
         # Set a property of the SI4713 chip.  These are both 16-bit values.
         self._BUFFER[0] = _SI4710_CMD_SET_PROPERTY
         self._BUFFER[1] = 0
@@ -191,7 +205,7 @@ class SI4713:
         self._BUFFER[5] = val & 0xFF
         self._write_from(self._BUFFER, count=6)
 
-    def _get_product_number(self):
+    def _get_product_number(self) -> int:
         # Retrieve the product number/ID value of the chip and return it.
         # First send a get revision command.
         self._BUFFER[0] = _SI4710_CMD_GET_REV
@@ -207,7 +221,7 @@ class SI4713:
         # cmp = (self._BUFFER[6] << 8) | self._BUFFER[7]
         # rev = (self._BUFFER[8])
 
-    def reset(self):
+    def reset(self) -> None:
         """Perform a reset of the chip using the reset line.  Will also
         perform necessary chip power up procedures."""
         # Toggle reset low for a few milliseconds if the line was provided.
@@ -239,7 +253,7 @@ class SI4713:
         self._set_property(_SI4713_PROP_TX_ACOMP_ENABLE, 0x0)
 
     @property
-    def interrupt_status(self):
+    def interrupt_status(self) -> int:
         """Read the interrupt bit status of the chip.  This will return a byte
         value with interrupt status bits as defined by the radio, see page
         11 of the AN332 programming guide:
@@ -247,7 +261,7 @@ class SI4713:
         """
         return self._read_u8(_SI4710_CMD_GET_INT_STATUS)
 
-    def _poll_interrupt_status(self, expected):
+    def _poll_interrupt_status(self, expected: int) -> None:
         # Poll the interrupt status bit for an expected exact value.
         # Will throw an exception if the timeout is exceeded before the status
         # reaches the desired value.
@@ -257,7 +271,7 @@ class SI4713:
             if time.monotonic() - start > self._timeout_s:
                 raise RuntimeError("Timeout waiting for SI4713 to respond!")
 
-    def _tune_status(self):
+    def _tune_status(self) -> None:
         # Retrieve the tune status command values from the radio.  Will store
         # the raw result of the tune status command in self._BUFFER (see page
         # 22 of AN332).
@@ -268,7 +282,7 @@ class SI4713:
         # Now read 8 bytes of response data.
         self._read_into(self._BUFFER, count=8)
 
-    def _asq_status(self):
+    def _asq_status(self) -> None:
         # Retrieve the ASQ (audio signal quality) status from the chip.  Will
         # store the raw result of the ASQ status command in self._BUFFER (see
         # page 25 of AN332).
@@ -280,7 +294,7 @@ class SI4713:
         self._read_into(self._BUFFER, count=5)
 
     @property
-    def tx_frequency_khz(self):
+    def tx_frequency_khz(self) -> int:
         """Get and set the transmit frequency of the chip (in kilohertz).  See
         AN332 page 19 for a discussion of the constraints on this value, in
         particular only a multiple of 50khz can be specified, and the value
@@ -293,7 +307,7 @@ class SI4713:
         return frequency * 10
 
     @tx_frequency_khz.setter
-    def tx_frequency_khz(self, val):
+    def tx_frequency_khz(self, val: int) -> None:
         assert 76000 <= val <= 108000
         assert (val % 50) == 0
         # Convert to units of 10khz that chip expects.
@@ -308,7 +322,7 @@ class SI4713:
         self._poll_interrupt_status(0x81)
 
     @property
-    def tx_power(self):
+    def tx_power(self) -> int:
         """Get and set the transmit power in dBuV (decibel microvolts).  Can
         be a value within the range of 88-115, or 0 to indicate transmission
         power is disabled.  Setting this value assumes auto-tuning of antenna
@@ -319,7 +333,7 @@ class SI4713:
         # Reconstruct power from tune status response and return it.
         return self._BUFFER[5]
 
-    def set_tx_power_capacitance(self, tx_power, capacitance):
+    def set_tx_power_capacitance(self, tx_power: int, capacitance: float) -> None:
         """Set both the transmit power (in dBuV, from 88-115) and antenna
         capacitance of the transmitter.  Capacitance is a value specified in
         pF from 0.25 to 47.75 (in 0.25 steps), or 0 to indicate automatic
@@ -342,12 +356,12 @@ class SI4713:
         self._write_from(self._BUFFER, count=5)
 
     @tx_power.setter
-    def tx_power(self, val):
+    def tx_power(self, val: int) -> None:
         # Assume automatic antenna capacitance tuning (0 value).
         self.set_tx_power_capacitance(val, 0)
 
     @property
-    def tx_antenna_capacitance(self):
+    def tx_antenna_capacitance(self) -> float:
         """Read the transmit antenna capacitance in pico-Farads (pF).  Use the
         set_tx_power_capacitance function to change this value (must also
         change transmit power at the same time).  It's uncommon to adjust this
@@ -358,7 +372,9 @@ class SI4713:
         # (scaled appropriately for pF units).
         return self._BUFFER[6] * 0.25
 
-    def received_noise_level(self, frequency_khz, antenna_capacitance=0):
+    def received_noise_level(
+        self, frequency_khz: int, antenna_capacitance: float = 0
+    ) -> int:
         """Measure the received noise level for the specified frequency (in
         kilohertz, 76mhz - 108mhz and must be a multiple of 50) and return its
         value in units of dBuV (decibel microvolts).  Will use automatic
@@ -388,7 +404,7 @@ class SI4713:
         return self._BUFFER[7]
 
     @property
-    def input_level(self):
+    def input_level(self) -> int:
         """Read the input level of audio to the chip and return it in dBfs
         units.
         """
@@ -397,7 +413,7 @@ class SI4713:
         return struct.unpack("bbbbb", self._BUFFER[0:5])[4]
 
     @property
-    def audio_signal_status(self):
+    def audio_signal_status(self) -> int:
         """Retrieve the ASQ or audio signal quality status value from the chip.
         This is a byte that indicates if the transmitted input audio signal is
         overmodulating (too high) or above/below input audio level thresholds.
@@ -408,7 +424,9 @@ class SI4713:
         self._asq_status()
         return self._BUFFER[1]
 
-    def gpio_control(self, gpio1=False, gpio2=False, gpio3=False):
+    def gpio_control(
+        self, gpio1: bool = False, gpio2: bool = False, gpio3: bool = False
+    ) -> None:
         """Control the GPIO outputs of the chip.  Each gpio1, gpio2, gpio3
         parameter is a boolean that indicates if that GPIO channel
         (corresponding to GPIO1, GPIO2, GPIO3 of the chip respectively) is
@@ -428,7 +446,9 @@ class SI4713:
         self._BUFFER[1] = control
         self._write_from(self._BUFFER, count=2)
 
-    def gpio_set(self, gpio1=False, gpio2=False, gpio3=False):
+    def gpio_set(
+        self, gpio1: bool = False, gpio2: bool = False, gpio3: bool = False
+    ) -> None:
         """Drive the GPIO outputs of the chip that are enabled with active
         output.  Each gpio1, gpio2, gpio3 parameter is a boolean that indicates
         if the associated GPIO (corresponding to GPIO1, GPIO2, GPIO3 of the
@@ -449,7 +469,7 @@ class SI4713:
         self._BUFFER[1] = set_command
         self._write_from(self._BUFFER, count=2)
 
-    def _set_rds_station(self, station):
+    def _set_rds_station(self, station: ReadableBuffer) -> None:
         # Set the RDS station broadcast value.
         station_length = len(station)
         assert 0 <= station_length <= 96
@@ -463,7 +483,7 @@ class SI4713:
             self._BUFFER[5] = station[i + 3] if i + 3 < station_length else 0x00
             self._write_from(self._BUFFER, count=6)
 
-    def _set_rds_buffer(self, rds_buffer):
+    def _set_rds_buffer(self, rds_buffer: ReadableBuffer) -> None:
         # Set the RDS buffer broadcast value.
         buf_length = len(rds_buffer)
         # 53 blocks in the circular buffer, each 2 bytes long.
@@ -500,7 +520,12 @@ class SI4713:
                           """,
     )
 
-    def configure_rds(self, program_id, station=None, rds_buffer=None):
+    def configure_rds(
+        self,
+        program_id: int,
+        station: Optional[ReadableBuffer] = None,
+        rds_buffer: Optional[ReadableBuffer] = None,
+    ) -> None:
         """Configure and enable the RDS broadcast of the specified program ID.
         Program ID must be a 16-bit value that will be broacast on the RDS
         bands of the transmitter.  Specify optional station and RDS buffer
