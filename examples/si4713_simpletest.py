@@ -14,6 +14,7 @@ FREQUENCY_KHZ = 102300  # 102.300mhz
 
 # Initialize I2C bus.
 i2c = board.I2C()  # uses board.SCL and board.SDA
+# i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
 
 # Initialize SI4713.
 # si4713 = adafruit_si4713.SI4713(i2c)
