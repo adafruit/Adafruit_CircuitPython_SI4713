@@ -27,6 +27,7 @@ at: https://github.com/adafruit/Adafruit-Si4713-Library/
   https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
 
 """
+
 import time
 
 from micropython import const
@@ -40,9 +41,10 @@ from adafruit_bus_device import i2c_device
 
 try:
     from typing import Optional
-    from circuitpython_typing import WriteableBuffer, ReadableBuffer
-    from digitalio import DigitalInOut
+
     from busio import I2C
+    from circuitpython_typing import ReadableBuffer, WriteableBuffer
+    from digitalio import DigitalInOut
 except ImportError:
     pass
 
@@ -128,7 +130,7 @@ class SI4713:
         *,
         address: int = _SI4710_ADDR1,
         reset: Optional[DigitalInOut] = None,
-        timeout_s: float = 0.1
+        timeout_s: float = 0.1,
     ) -> None:
         self._timeout_s = timeout_s
 
@@ -372,9 +374,7 @@ class SI4713:
         # (scaled appropriately for pF units).
         return self._BUFFER[6] * 0.25
 
-    def received_noise_level(
-        self, frequency_khz: int, antenna_capacitance: float = 0
-    ) -> int:
+    def received_noise_level(self, frequency_khz: int, antenna_capacitance: float = 0) -> int:
         """Measure the received noise level for the specified frequency (in
         kilohertz, 76mhz - 108mhz and must be a multiple of 50) and return its
         value in units of dBuV (decibel microvolts).  Will use automatic
@@ -424,9 +424,7 @@ class SI4713:
         self._asq_status()
         return self._BUFFER[1]
 
-    def gpio_control(
-        self, gpio1: bool = False, gpio2: bool = False, gpio3: bool = False
-    ) -> None:
+    def gpio_control(self, gpio1: bool = False, gpio2: bool = False, gpio3: bool = False) -> None:
         """Control the GPIO outputs of the chip.  Each gpio1, gpio2, gpio3
         parameter is a boolean that indicates if that GPIO channel
         (corresponding to GPIO1, GPIO2, GPIO3 of the chip respectively) is
@@ -446,9 +444,7 @@ class SI4713:
         self._BUFFER[1] = control
         self._write_from(self._BUFFER, count=2)
 
-    def gpio_set(
-        self, gpio1: bool = False, gpio2: bool = False, gpio3: bool = False
-    ) -> None:
+    def gpio_set(self, gpio1: bool = False, gpio2: bool = False, gpio3: bool = False) -> None:
         """Drive the GPIO outputs of the chip that are enabled with active
         output.  Each gpio1, gpio2, gpio3 parameter is a boolean that indicates
         if the associated GPIO (corresponding to GPIO1, GPIO2, GPIO3 of the
